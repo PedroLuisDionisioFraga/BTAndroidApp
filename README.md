@@ -61,11 +61,11 @@ its functionalities
    git clone https://github.com/tuuhin/BTAndroidApp.git
    ```
 
-2. **Open Project**
-   Open the project in android studio
+2. **Build with Docker:**
 
-3. **Build and Run**
-   Build and run on android device with API _29_ (Android 10) and above
+   ```bash
+   docker run --rm -v ".:/project" -w /project mingc/android-build-box bash -c "sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew assembleDebug"
+   ```
 
 ### :curly_loop: Feedback and Support
 
@@ -77,7 +77,7 @@ an [issue](https://github.com/tuuhin/BTAndroidApp/issues/new)
 We welcome contributions to the `BTAndroidApp` project! Please take a moment to review
 our [Contribution Guidelines](CONTRIBUTING.md) before submitting pull requests or issues.
 
-## :end: Conclusiion
+## :end: Conclusion
 
 The Bluetooth Android Terminal App is a versatile tool for interacting with Bluetooth and BLE
 devices. While the app aims to provide a seamless experience and was created to debug esp32 based
