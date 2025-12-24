@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.BluetoothLEClientConnector
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.models.BLECharacteristicsModel
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.models.BLEDescriptorModel
+import com.eva.bluetoothterminalapp.domain.bluetooth_le.util.parseStringToByteArray
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.BLECharacteristicEvent
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.BLEDeviceConfigEvent
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.BLEDeviceProfileState
@@ -107,7 +108,11 @@ class BLEDeviceViewModel(
 			}
 
 			is WriteCharacteristicEvent.OnTextFieldValueChange -> _writeDialogState.update { state ->
-				state.copy(textFieldValue = event.value)
+				state.copy(textFieldValue = event.value, errorText = null)
+			}
+
+			is WriteCharacteristicEvent.OnWriteFormatChange -> _writeDialogState.update { state ->
+				state.copy(writeFormat = event.format, errorText = null)
 			}
 
 			WriteCharacteristicEvent.OpenDialog -> _writeDialogState.update { selected ->
@@ -188,13 +193,24 @@ class BLEDeviceViewModel(
 		val characteristic = _selectedCharacteristic.value.characteristic ?: return
 		val service = _selectedCharacteristic.value.service ?: return
 		val value = _writeDialogState.value.textFieldValue
+		val format = _writeDialogState.value.writeFormat
 
 		if (value.isBlank()) {
 			_writeDialogState.update { state -> state.copy(errorText = "Cant send blank value") }
 			return
 		}
 
-		val result = bleConnector.write(service, characteristic, value = value)
+		val parseResult = parseStringToByteArray(value, format)
+
+		if (parseResult.isFailure) {
+			val errorMessage = parseResult.exceptionOrNull()?.message ?: "Invalid format"
+			_writeDialogState.update { state -> state.copy(errorText = errorMessage) }
+			return
+		}
+
+		val bytes = parseResult.getOrNull() ?: return
+
+		val result = bleConnector.write(service, characteristic, value = bytes)
 
 		result.fold(
 			onFailure = { err ->

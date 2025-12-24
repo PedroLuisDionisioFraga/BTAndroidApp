@@ -88,7 +88,13 @@
   <string name="ble_characteristic_not_selected_title">No Selected Characteristic</string>
   <string name="ble_characteristic_not_selected_desc">Select a characteristic in order to continue</string>
   <string name="write_characteristic_dialog_title">Write Characteristic</string>
-  <string name="write_characteristic_dialog_desc">Enter text value in utf-8 to write to.</string>
+  <string name="write_characteristic_dialog_desc">Enter the value to write in the selected format.</string>
+  <string name="ble_write_format_title">Write Format</string>
+  <string name="ble_write_format_hex_hint">Enter hex values (e.g., 48 65 6C 6C 6F)</string>
+  <string name="ble_write_format_utf8_hint">Enter text (e.g., Hello)</string>
+  <string name="ble_write_format_octal_hint">Enter octal values (e.g., 110 145 154 154 157)</string>
+  <string name="ble_write_format_binary_hint">Enter binary values (e.g., 01001000 01100101)</string>
+  <string name="ble_write_format_int_hint">Enter integer values (e.g., 72 101 108 108 111)</string>
   <string name="bluetooth_device_mac_address_title">MAC : </string>
   <string name="ble_disable_notification">Notification are disabled</string>
   <string name="ble_enable_indication">Indications are enabled</string>
@@ -221,4 +227,11 @@
   <string name="ble_device_connecting">Connecting to device</string>
   <string name="ble_device_no_service_found">No Services found, make sure device is connected</string>
   <string name="ble_characteristics_title">Characteristics</string>
+  <string name="ble_data_view_title">Data type</string>
+  <string name="ble_data_type_hex">Hex</string>
+  <string name="ble_data_type_utf8">UTF-8</string>
+  <string name="ble_data_type_octal">Octal</string>
+  <string name="ble_data_type_binary">Binary</string>
+  <string name="ble_data_type_int_signed">Int (Signed)</string>
+  <string name="ble_data_type_int_unsigned">Int (Unsigned)</string>
 </resources>

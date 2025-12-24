@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.eva.bluetoothterminalapp.R
+import com.eva.bluetoothterminalapp.domain.bluetooth_le.enums.BLEValueDisplayFormat
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.models.BLECharacteristicsModel
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.util.toReadableProperties
 import com.eva.bluetoothterminalapp.presentation.util.PreviewFakes
@@ -51,18 +52,31 @@ fun BLECharacteristicsCard(
 	onStopIndicate: () -> Unit,
 	onIndicate: () -> Unit,
 	modifier: Modifier = Modifier,
+	displayFormat: BLEValueDisplayFormat = BLEValueDisplayFormat.HEX,
+	onDisplayFormatChange: (BLEValueDisplayFormat) -> Unit = {},
 	titleColor: Color = MaterialTheme.colorScheme.primary,
 	valuesColor: Color = MaterialTheme.colorScheme.secondary,
 	containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
 	shape: Shape = MaterialTheme.shapes.large,
 ) {
 
-	val showStringValue = remember(characteristic.byteArray) {
-		characteristic.valueAsString?.isNotBlank() == true
+	val formattedValue = remember(characteristic.byteArray, displayFormat) {
+		characteristic.getValueForFormat(displayFormat)
 	}
 
-	val showHexValue = remember(characteristic.byteArray) {
-		characteristic.valueHexString.isNotBlank()
+	val hasValue = remember(formattedValue) {
+		formattedValue.isNotBlank()
+	}
+
+	val formatLabel = remember(displayFormat) {
+		when (displayFormat) {
+			BLEValueDisplayFormat.HEX -> "Hex"
+			BLEValueDisplayFormat.UTF8 -> "UTF-8"
+			BLEValueDisplayFormat.OCTAL -> "Octal"
+			BLEValueDisplayFormat.BINARY -> "Binary"
+			BLEValueDisplayFormat.SIGNED_INT -> "Int (Signed)"
+			BLEValueDisplayFormat.UNSIGNED_INT -> "Int (Unsigned)"
+		}
 	}
 
 	Card(
@@ -113,37 +127,23 @@ fun BLECharacteristicsCard(
 				modifier = Modifier.padding(vertical = 2.dp),
 				color = MaterialTheme.colorScheme.outlineVariant
 			)
+			BLEValueFormatSelector(
+				selectedFormat = displayFormat,
+				onFormatSelected = onDisplayFormatChange,
+			)
 			AnimatedVisibility(
-				visible = showHexValue,
+				visible = hasValue,
 				enter = slideInVertically { height -> height } + fadeIn(),
 				exit = slideOutVertically { height -> -height } + fadeOut()
 			) {
 				Text(
 					text = buildAnnotatedString {
-						append(stringResource(id = R.string.ble_value_hex))
-						append(" :")
-						append(characteristic.valueHexString)
+						append("$formatLabel: ")
+						append(formattedValue)
 					},
 					style = MaterialTheme.typography.labelLarge,
 					color = valuesColor,
 				)
-
-			}
-			AnimatedVisibility(
-				visible = showStringValue,
-				enter = slideInVertically { height -> height } + fadeIn(),
-				exit = slideOutVertically { height -> -height } + fadeOut()
-			) {
-				Text(
-					text = buildAnnotatedString {
-						append(stringResource(R.string.ble_readable_value))
-						append(" :")
-						append(characteristic.valueAsString ?: "None")
-					},
-					style = MaterialTheme.typography.labelLarge,
-					color = valuesColor,
-				)
-
 			}
 			BLECharacteristicsActions(
 				characteristic = characteristic,

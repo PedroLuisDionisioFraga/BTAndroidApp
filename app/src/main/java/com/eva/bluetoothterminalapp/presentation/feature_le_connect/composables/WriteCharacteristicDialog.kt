@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialogDefaults
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.eva.bluetoothterminalapp.R
+import com.eva.bluetoothterminalapp.domain.bluetooth_le.enums.BLEValueDisplayFormat
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.CharacteristicWriteDialogState
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.WriteCharacteristicEvent
 import com.eva.bluetoothterminalapp.ui.theme.BlueToothTerminalAppTheme
@@ -40,7 +42,9 @@ fun WriteCharacteristicsDialog(
 	showDialog: Boolean,
 	textFieldValue: String,
 	errorString: String?,
+	writeFormat: BLEValueDisplayFormat,
 	onValueChange: (String) -> Unit,
+	onFormatChange: (BLEValueDisplayFormat) -> Unit,
 	onSend: () -> Unit,
 	onCancel: () -> Unit,
 	modifier: Modifier = Modifier,
@@ -56,6 +60,17 @@ fun WriteCharacteristicsDialog(
 
 	val isSendButtonEnable by remember(textFieldValue) {
 		derivedStateOf(textFieldValue::isNotBlank)
+	}
+
+	val placeholderText = remember(writeFormat) {
+		when (writeFormat) {
+			BLEValueDisplayFormat.HEX -> "48 65 6C 6F"
+			BLEValueDisplayFormat.UTF8 -> "Hello"
+			BLEValueDisplayFormat.OCTAL -> "110 145 154"
+			BLEValueDisplayFormat.BINARY -> "010010 011001"
+			BLEValueDisplayFormat.SIGNED_INT -> "72 101 108"
+			BLEValueDisplayFormat.UNSIGNED_INT -> "72 101 108"
+		}
 	}
 
 	BasicAlertDialog(
@@ -82,7 +97,12 @@ fun WriteCharacteristicsDialog(
 					color = textContentCOlor,
 					style = MaterialTheme.typography.bodyMedium
 				)
-
+				Spacer(modifier = Modifier.height(8.dp))
+				BLEValueFormatSelector(
+					selectedFormat = writeFormat,
+					onFormatSelected = onFormatChange,
+					modifier = Modifier.fillMaxWidth()
+				)
 				OutlinedTextField(
 					value = textFieldValue,
 					onValueChange = onValueChange,
@@ -90,9 +110,11 @@ fun WriteCharacteristicsDialog(
 					shape = MaterialTheme.shapes.medium,
 					isError = errorString != null,
 					placeholder = {
-						Text(text = stringResource(R.string.text_field_placeholder))
+						Text(text = placeholderText)
 					},
-					modifier = Modifier.padding(vertical = 12.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 12.dp),
 				)
 				errorString?.let { err ->
 					Text(
@@ -144,7 +166,9 @@ fun WriteCharacteristicsDialog(
 		showDialog = state.showDialog,
 		errorString = state.errorText,
 		textFieldValue = state.textFieldValue,
+		writeFormat = state.writeFormat,
 		onValueChange = { onEvent(WriteCharacteristicEvent.OnTextFieldValueChange(it)) },
+		onFormatChange = { onEvent(WriteCharacteristicEvent.OnWriteFormatChange(it)) },
 		onSend = { onEvent(WriteCharacteristicEvent.WriteCharacteristicValue) },
 		onCancel = { onEvent(WriteCharacteristicEvent.CloseDialog) },
 		modifier = modifier,
@@ -165,7 +189,9 @@ private fun WriteCharacteristicDialogPreview() = BlueToothTerminalAppTheme {
 		showDialog = true,
 		errorString = "Empty string are not allowed",
 		textFieldValue = "",
+		writeFormat = BLEValueDisplayFormat.UTF8,
 		onValueChange = {},
+		onFormatChange = {},
 		onCancel = {},
 		onSend = {},
 	)

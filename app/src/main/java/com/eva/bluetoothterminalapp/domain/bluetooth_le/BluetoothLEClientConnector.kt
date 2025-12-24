@@ -65,10 +65,10 @@ interface BluetoothLEClientConnector {
 	 * Writes the value to a [BLECharacteristicsModel]
 	 * @param service Service in which the characteristic is present
 	 * @param characteristic The characteristic to write to
-	 * @param value The [String] value to be written
+	 * @param value The [ByteArray] value to be written
 	 * @return [Result] indicating operation has successfully started
 	 */
-	fun write(service: BLEServiceModel, characteristic: BLECharacteristicsModel, value: String)
+	fun write(service: BLEServiceModel, characteristic: BLECharacteristicsModel, value: ByteArray)
 			: Result<Boolean>
 
 

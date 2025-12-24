@@ -18,7 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.eva.bluetoothterminalapp.R
+import com.eva.bluetoothterminalapp.domain.bluetooth_le.enums.BLEValueDisplayFormat
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.models.BLECharacteristicsModel
 import com.eva.bluetoothterminalapp.domain.bluetooth_le.models.BLEDescriptorModel
 import com.eva.bluetoothterminalapp.presentation.feature_le_connect.state.BLECharacteristicEvent
@@ -51,6 +54,8 @@ fun BLEReadWriteSheetContent(
 	val hasDescriptors by remember(characteristic?.descriptors) {
 		derivedStateOf { characteristic?.descriptors?.isNotEmpty() == true }
 	}
+
+	var displayFormat by remember { mutableStateOf(BLEValueDisplayFormat.HEX) }
 
 	if (characteristic == null) {
 		Column(
@@ -91,6 +96,8 @@ fun BLEReadWriteSheetContent(
 		BLECharacteristicsCard(
 			characteristic = characteristic,
 			isDeviceConnected = isDeviceConnected,
+			displayFormat = displayFormat,
+			onDisplayFormatChange = { displayFormat = it },
 			onRead = onRead,
 			onWrite = onWrite,
 			onNotify = onNotify,

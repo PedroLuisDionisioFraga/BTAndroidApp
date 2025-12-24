@@ -153,10 +153,10 @@ class AndroidBLEClientConnector(
 	override fun write(
 		service: BLEServiceModel,
 		characteristic: BLECharacteristicsModel,
-		value: String
+		value: ByteArray
 	): Result<Boolean> {
 		return try {
-			val bytes = value.encodeToByteArray()
+			val bytes = value
 
 			val gattCharacteristic = _gattCallback.findCharacteristicFromDomainModel(
 				service = service,
